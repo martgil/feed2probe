@@ -12,12 +12,14 @@ import (
 )
 
 var opts struct {
-	Filter string `short:"f" long:"filter" default:"*" description:"filter based on status Codes: 200,302,400,500 \ndefault: *"`
+	Filter string `short:"f" long:"filter" default:"*" description:"filter based on status Codes: 200,302,400,500"`
+	Probe bool `short:"p" long:"probe" description:"perform domain check to extract alive domains"`
 }
 
 func main() {
 	_,err := flags.ParseArgs(&opts, os.Args)
 	if err != nil{
+		fmt.Println(err)
 		os.Exit(1)
 	}
 	s := bufio.NewScanner(os.Stdin)
@@ -45,16 +47,20 @@ func main() {
 
 func Run(urls chan string, worker *sync.WaitGroup) {
 	for url := range urls {
-		response,err := http.Get(url)
+		scheme := "https://"
+		var furl string 
+		if opts.Probe { furl = scheme + url } else { furl = url }
+		response,err := http.Get(furl)
 		if err != nil {
-			return ;
+			fmt.Println(err)
 		}
 
 		if opts.Filter == "*" {
-			fmt.Printf("[%d] %s \n", response.StatusCode, url)
+			fmt.Printf("[%d] %s \n", response.StatusCode , url)
 		} else if opts.Filter == strconv.Itoa(response.StatusCode) {
 			fmt.Printf("[%d] %s \n", response.StatusCode, url)
 		}
+		response.Body.Close()
 		
 	}
 }
