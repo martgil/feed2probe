@@ -37,12 +37,11 @@ func main() {
 
 	worker := &sync.WaitGroup{}
 
-	for i := 0; i < 20; i++ {
+	for i := 0; i < 8; i++ {
 		worker.Add(1)
 		go Run(urls, worker)
 	}
 	worker.Wait()
-
 }
 
 func Run(urls chan string, worker *sync.WaitGroup) {
@@ -52,7 +51,7 @@ func Run(urls chan string, worker *sync.WaitGroup) {
 		if opts.Probe { furl = scheme + url } else { furl = url }
 		response,err := http.Get(furl)
 		if err != nil {
-			fmt.Println(err)
+			continue
 		}
 
 		if opts.Filter == "*" {
@@ -60,8 +59,7 @@ func Run(urls chan string, worker *sync.WaitGroup) {
 		} else if opts.Filter == strconv.Itoa(response.StatusCode) {
 			fmt.Printf("[%d] %s \n", response.StatusCode, url)
 		}
-		response.Body.Close()
-		
 	}
+	worker.Done()
 }
 
