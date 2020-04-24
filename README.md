@@ -16,3 +16,7 @@ Apply HTTP Code filters using `-f <status-code>`
 ```bash
 cat target.txt | feed2probe -f 200
 ```
+Added `-p` for checking alive host
+```bash
+cat target.txt | feed2probe -p
+```
