@@ -61,7 +61,11 @@ func Run(urls chan string, worker *sync.WaitGroup) {
                         i := 0
                         for ; i < len(strings.Split(opts.Filter,",")); {
                                 if strings.Split(opts.Filter,",")[i] == strconv.Itoa(response.StatusCode) {
-                                        fmt.Printf("[%d] %s \n", response.StatusCode, url)
+									if response.StatusCode == 200 && opts.Probe  {
+										fmt.Printf("%s \n", url)
+									} else {
+										fmt.Printf("[%d] %s \n", response.StatusCode, url)
+									}
                                 }
                                 i += 1
                         }
