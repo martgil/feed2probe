@@ -9,7 +9,7 @@ Go version => go1.13.8
 
 ### Features
 - Multiple http codes filtering using `-f` flag
-- Displaying response size for better filtering (use grep for filtering since there was no size filter ATM. Example: `cat domains.txt | feed2probe -p | grep <size-to-exclude-from-list>)
+- Displaying response size for better filtering (use grep for filtering since there was no size filter ATM. Example: `cat domains.txt | feed2probe -p | grep <size-to-exclude-from-list>)`
 - Probe domains using `-p` flag (Leave it blank for URL)
 
 ### Usage
