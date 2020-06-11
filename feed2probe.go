@@ -10,6 +10,7 @@ import (
                 flags "github.com/jessevdk/go-flags"
                 "strconv"
                 "strings"
+		"io/ioutil"
 )
 
 var opts struct {
@@ -54,18 +55,24 @@ func Run(urls chan string, worker *sync.WaitGroup) {
                 if err != nil {
                         continue
                 }
-
+		defer response.Body.Close()
+		body,err := ioutil.ReadAll(response.Body)
+		if err != nil {
+			log.Fatal(err)
+		}
+                ContentLength := len(string(body))
+                StatusCode := response.StatusCode
                 if opts.Filter == "*" {
-                        fmt.Printf("[%d] %s \n", response.StatusCode , url)
+                        fmt.Printf("[%d] [%d] %s \n", StatusCode , ContentLength , furl)
                 } else {
                         i := 0
                         for ; i < len(strings.Split(opts.Filter,",")); {
-                                if strings.Split(opts.Filter,",")[i] == strconv.Itoa(response.StatusCode) {
-									if response.StatusCode == 200 && opts.Probe  {
-										fmt.Printf("%s \n", url)
-									} else {
-										fmt.Printf("[%d] %s \n", response.StatusCode, url)
-									}
+                                if strings.Split(opts.Filter,",")[i] == strconv.Itoa(StatusCode) {
+                                        if (StatusCode == 200 || StatusCode == 404) && opts.Probe  {
+                                                fmt.Printf("%s\n", furl)
+                                        } else {
+                                                fmt.Printf("[%d] %d %s \n", StatusCode, ContentLength , furl)
+                                        }
                                 }
                                 i += 1
                         }
